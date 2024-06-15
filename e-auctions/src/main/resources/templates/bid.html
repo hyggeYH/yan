@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auction Details</title>
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #4caf50;
+            padding: 20px;
+            text-align: center;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .header .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 2px solid white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header .nav-links a:hover {
+            background-color: white;
+            color: #4caf50;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+            flex-grow: 1;
+        }
+
+        h2, h3 {
+            color: #4caf50;
+            margin-bottom: 20px;
+        }
+
+        .auction-details {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+
+        .submit-button {
+            width: 100%;
+            padding: 10px 0;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .submit-button:hover {
+            background-color: #45a049;
+        }
+
+        .bidders-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .bidders-list li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Welcome, <span th:text="${user.fullname}">User</span></h1>
+    <div class="nav-links">
+        <a href="/user-page">Back to User Page</a>
+        <a href="/profile">Profile</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<div class="container">
+    <h2>Auction Details</h2>
+    <div class="auction-details">
+        <h3 th:text="${auction.name}">Auction Title</h3>
+        <p th:text="${auction.description}">Auction Description</p>
+        <p>Starting Price: $<span th:text="${auction.startingPrice}">X.XX</span></p>
+        <p>Start Time: <span th:text="${auction.startTime}">Start Time</span></p>
+        <p>End Time: <span th:text="${auction.endTime}">End Time</span></p>
+        <p>Email: <span th:text="${auction.email}">Email</span></p>
+        <p>Product: <span th:text="${auction.product}">Product</span></p>
+        <!-- Форма для ставки -->
+        <form id="bidForm">
+            <div class="form-group">
+                <label for="bidAmount">Enter Your Bid:</label>
+                <input type="number" step="0.01" id="bidAmount" name="bidAmount" placeholder="Enter bid amount" required>
+            </div>
+            <input type="hidden" id="auctionId" name="auctionId" th:value="${auction.id}"/>
+            <button type="submit" class="submit-button">Place Bid</button>
+        </form>
+    </div>
+    <h3>Bidders</h3>
+    <ul id="bidders-list" class="bidders-list">
+        <li th:each="bid : ${bids}">
+            <span th:text="${bid.bidderName}">User Name</span> - $<span th:text="${bid.amount}">X.XX</span>
+        </li>
+    </ul>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const auctionId = document.getElementById('auctionId').value;
+
+        function loadBids() {
+            fetch(`/auctions/${auctionId}/bids`)
+                .then(response => response.json())
+                .then(data => {
+                    const biddersList = document.getElementById('bidders-list');
+                    biddersList.innerHTML = ''; // Очистка текущего списка
+                    data.forEach(bid => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = bid.bidderName + ' - $' + bid.amount;
+                        biddersList.appendChild(listItem);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error loading bids:', error);
+                });
+        }
+
+        loadBids();
+
+        document.getElementById('bidForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(event.target);
+            const bidData = {
+                amount: formData.get('bidAmount'),
+                auctionId: formData.get('auctionId')
+            };
+
+            console.log('Bid Data:', bidData); // Debug log
+
+            fetch('/api/bid', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(bidData)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Bid placed:', data);
+                    updateBiddersList(data);
+                })
+                .catch(error => {
+                    console.error('Error placing bid:', error);
+                });
+        });
+
+        function updateBiddersList(bidData) {
+            const biddersList = document.getElementById('bidders-list');
+            const listItem = document.createElement('li');
+            listItem.textContent = bidData.bidderName + ' - $' + bidData.amount; // Используем bidData.bidderName и bidData.amount
+            biddersList.appendChild(listItem);
+        }
+    });
+</script>
+</body>
+
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration Form</title>
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 500px;
+            margin: 100px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+        }
+
+        label {
+            display: block;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 15px;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        input[type="submit"] {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            background-color: #4caf50;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .message {
+            color: red;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .login-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .login-link a {
+            color: #4caf50;
+            text-decoration: none;
+            border-bottom: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .login-link a:hover {
+            border-color: #4caf50;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>Registration Form</h2>
+    <div class="message" th:if="${message != null}">
+        [[${message}]]
+    </div>
+    <form th:action="@{/registration}" method="post" role="form" th:object="${user}">
+        <div class="form-group">
+            <label for="fullname">Fullname:</label>
+            <input th:field="*{fullname}" type="text" id="fullname" name="fullname" placeholder="Enter your fullname" required>
+        </div>
+
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input th:field="*{email}" type="email" id="email" name="email" placeholder="Enter your email" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input th:field="*{password}" type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <input type="submit" value="Register">
+    </form>
+    <div class="login-link">
+        <a href="/login">Already have an account? Login here</a>
+    </div>
+</div>
+</body>
+</html>

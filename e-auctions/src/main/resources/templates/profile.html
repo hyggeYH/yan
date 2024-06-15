@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Auctions</title>
+    <style>
+        body {
+            background-color: #f9fafb;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background-color: #4caf50;
+            padding: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        .header .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .header .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            border: 2px solid white;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .header .nav-links a:hover {
+            background-color: white;
+            color: #4caf50;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1200px;
+            margin: 50px auto;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 30px 0px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .auction-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .auction-item {
+            border-bottom: 1px solid #e0e0e0;
+            padding: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .auction-item:last-child {
+            border-bottom: none;
+        }
+
+        .auction-item .details {
+            flex-grow: 1;
+        }
+
+        .auction-item .details h3 {
+            margin: 0 0 10px;
+            font-size: 1.2em;
+        }
+
+        .auction-item .details p {
+            margin: 5px 0;
+            color: #666;
+        }
+
+        .auction-item .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .auction-item .action-buttons button {
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .auction-item .action-buttons .edit-button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+        }
+
+        .auction-item .action-buttons .edit-button:hover {
+            background-color: #0d8bf0;
+        }
+
+        .auction-item .action-buttons .delete-button {
+            background-color: #f44336;
+            color: white;
+            border: none;
+        }
+
+        .auction-item .action-buttons .delete-button:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Welcome, <span th:text="${user.fullname}">User</span></h1>
+    <div class="nav-links">
+        <a href="/new-auction">Create New Auction</a>
+        <a href="/user-page">Back to User Page</a>
+        <a href="/logout">Logout</a>
+    </div>
+</div>
+<div class="container">
+    <h2>Your Auctions</h2>
+
+    <ul class="auction-list">
+        <li class="auction-item" th:each="auction : ${userAuctions}">
+            <div class="details">
+                <h3 th:text="${auction.name}">Auction Title</h3>
+                <p th:text="${auction.description}">Auction Description</p>
+                <p>Current Bid: $<span th:text="${auction.startingPrice}">0.00</span></p>
+            </div>
+            <div class="action-buttons">
+                <a th:href="@{'/edit/' + ${auction.id}}">Edit</a>
+                <a th:href="@{'/delete/' + ${auction.id}}">Delete</a>
+            </div>
+        </li>
+    </ul>
+</div>
+</body>
+</html>
